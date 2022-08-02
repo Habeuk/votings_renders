@@ -1,0 +1,15 @@
+votings_renders.example:
+  path: '/votings-renders/example'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\votings_renders\Controller\VotingsRendersController::build'
+  requirements:
+    _permission: 'access content'
+
+votings_renders.settings_form:
+  path: '/admin/config/system/votings-renders'
+  defaults:
+    _title: 'votings_renders settings'
+    _form: 'Drupal\votings_renders\Form\SettingsForm'
+  requirements:
+    _permission: 'administer votings_renders configuration'

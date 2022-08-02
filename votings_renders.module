@@ -1,0 +1,52 @@
+<?php
+
+/**
+ *
+ * @file
+ * Primary module hooks for votings_renders module.
+ *
+ * @DCG
+ * This file is no longer required in Drupal 8.
+ * @see https://www.drupal.org/node/2217931
+ */
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\core\Entity\EntityTypeInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function votings_renders_theme($existing, $type, $theme, $path) {
+  return [
+    'votings_renders_item' => [
+      'variables' => [
+        'reaction' => NULL,
+        'icon' => NULL,
+        'label' => NULL,
+        'count' => NULL
+      ],
+      'template' => 'votings-renders-item'
+    ]
+  ];
+}
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function votings_renders_entity_type_build(array &$entity_types) {
+  $entity_types['vote']->setFormClass('votings_renders', 'Drupal\votings_renders\Form\VotingsRendersBooleanForm');
+}
+
+/**
+ *
+ * @param
+ *        $vars
+ */
+function votings_renders_preprocess_html(&$vars) {
+  \Drupal::messenger()->addStatus(__FUNCTION__);
+}
+
+

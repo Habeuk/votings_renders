@@ -1,0 +1,4 @@
+administer votings_renders configuration:
+  title: 'Administer votings_renders configuration'
+  description: 'Optional description.'
+  restrict access: true

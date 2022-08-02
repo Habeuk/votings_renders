@@ -1,0 +1,74 @@
+<?php
+
+/**
+ *
+ * @file
+ * Install, update and uninstall functions for the votings_renders module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function votings_renders_install() {
+  \Drupal::messenger()->addStatus(__FUNCTION__);
+  $reactions = _votings_renders_get_reactions();
+  $voteTypeStorage = \Drupal::service('entity_type.manager')->getStorage('vote_type');
+  
+  // Create reactions.
+  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->condition('id', array_keys($reactions), 'IN')->execute());
+  foreach ($reactions as $key => $label) {
+    $voteType = empty($voteTypes[$key]) ? $voteTypeStorage->create([
+      'id' => $key,
+      'label' => $label,
+      'value_type' => 'points',
+      'description' => 'Automatically created reaction'
+    ]) : $voteTypes[$key];
+    $voteType->save();
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function votings_renders_uninstall() {
+  \Drupal::messenger()->addStatus(__FUNCTION__);
+  $reactions = _votings_renders_get_reactions();
+  $voteTypeStorage = \Drupal::service('entity_type.manager')->getStorage('vote_type');
+  
+  // Remove reactions.
+  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->condition('id', array_keys($reactions), 'IN')->execute());
+  foreach ($voteTypes as $voteType) {
+    $voteType->delete();
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function votings_renders_requirements($phase) {
+  $requirements = [];
+  
+  if ($phase == 'runtime') {
+    $value = mt_rand(0, 100);
+    $requirements['votings_renders_status'] = [
+      'title' => t('votings_renders status'),
+      'value' => t('votings_renders value: @value', [
+        '@value' => $value
+      ]),
+      'severity' => $value > 50 ? REQUIREMENT_INFO : REQUIREMENT_WARNING
+    ];
+  }
+  
+  return $requirements;
+}
+
+/**
+ * Helper function to return default reactions.
+ */
+function _votings_renders_get_reactions() {
+  return [
+    "votings_renders_favorite" => "Definie en favorite",
+    "votings_renders_note" => "Note de l'entite"
+  ];
+}
+

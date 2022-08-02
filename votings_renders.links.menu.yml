@@ -1,0 +1,6 @@
+votings_renders.settings_form:
+  title: votings_renders
+  description: Configure votings_renders.
+  parent: system.admin_config_system
+  route_name: votings_renders.settings_form
+  weight: 10
