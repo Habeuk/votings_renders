@@ -40,13 +40,5 @@ function votings_renders_entity_type_build(array &$entity_types) {
   $entity_types['vote']->setFormClass('votings_renders', 'Drupal\votings_renders\Form\VotingsRendersBooleanForm');
 }
 
-/**
- *
- * @param
- *        $vars
- */
-function votings_renders_preprocess_html(&$vars) {
-  \Drupal::messenger()->addStatus(__FUNCTION__);
-}
 
 

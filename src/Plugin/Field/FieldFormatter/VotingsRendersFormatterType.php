@@ -4,6 +4,7 @@ namespace Drupal\votings_renders\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\layoutgenentitystyles\Services\LayoutgenentitystylesServices;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -41,6 +42,12 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
   protected $VoteResultFunctionManager;
   
   /**
+   *
+   * @var LayoutgenentitystylesServices
+   */
+  protected $LayoutgenentitystylesServices;
+  
+  /**
    * Constructs an VotingApiReactionFormatter object.
    *
    * @param string $plugin_id
@@ -60,10 +67,11 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    * @param \Drupal\Core\Entity\EntityFormBuilder $form_builder
    *        Form builder service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityFormBuilder $form_builder, VoteResultFunctionManager $VoteResultFunctionManager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityFormBuilder $form_builder, VoteResultFunctionManager $VoteResultFunctionManager, LayoutgenentitystylesServices $LayoutgenentitystylesServices) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->formBuilder = $form_builder;
     $this->VoteResultFunctionManager = $VoteResultFunctionManager;
+    $this->LayoutgenentitystylesServices = $LayoutgenentitystylesServices;
   }
   
   /**
@@ -71,7 +79,7 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['label'], $configuration['view_mode'], $configuration['third_party_settings'], $container->get('entity.form_builder'), $container->get('plugin.manager.votingapi.resultfunction'));
+    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['label'], $configuration['view_mode'], $configuration['third_party_settings'], $container->get('entity.form_builder'), $container->get('plugin.manager.votingapi.resultfunction'), $container->get('layoutgenentitystyles.add.style.theme'));
   }
   
   /**
@@ -80,6 +88,7 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    */
   public static function defaultSettings() {
     return [ // Implement default settings.
+      'text_empty' => 'Donner votre avis !'
     ] + parent::defaultSettings();
   }
   
@@ -88,8 +97,36 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    return [ // Implement settings form.
+    $form = [];
+    $form['text_empty'] = [
+      '#type' => 'text_field',
+      '#title' => 'Titre pour vote null'
+    ];
+    $form['library'] = [
+      '#title' => $this->t('Sort reactions'),
+      '#type' => 'select',
+      '#options' => [
+        'none' => $this->t('No sorting'),
+        'asc' => $this->t('Asc'),
+        'desc' => $this->t('Desc')
+      ],
+      '#element_validate' => [
+        [
+          $this,
+          'libraryCallback'
+        ]
+      ]
+    ];
+    $form = [
+      $form
     ] + parent::settingsForm($form, $form_state);
+    
+    return $form;
+  }
+  
+  public function libraryCallback(&$element, FormStateInterface $form_state, &$complete_form) {
+    // Ajoute la configuration à l'enregistrement du champs.
+    $this->LayoutgenentitystylesServices->addStyleFromModule("votings_renders/voting-render", 'votings_renders_formatter_type', 'default');
   }
   
   /**
@@ -145,12 +182,11 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
         ]
       ]
     ];
-    
     return $elements;
   }
   
   /**
-   * Recupere le vote de l'utilisateur (s'il a deja vote) ou genere l'entité.
+   * Recupere le vote de l'utilisateur (s'il a deja voté) ou genere l'entité.
    *
    * @param FieldItemListInterface $items
    */
