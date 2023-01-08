@@ -145,6 +145,8 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $extras = [];
+    $value = 0;
     // dump($items);
     $results = $this->VoteResultFunctionManager->getResults($items->getEntity()->getEntityTypeId(), $items->getEntity()->id());
     // dump($results);
@@ -155,9 +157,10 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
     ];
     if (!empty($results['votings_renders_note']['vote_average'])) {
       $votings_renders_note['#value'] = $results['votings_renders_note']['vote_average'] . '/5';
+      $value = $results['votings_renders_note']['vote_average'];
     }
-    $extras = [];
-    $form = $this->formBuilder->getForm($this->getVoteEntity($items), 'votings_renders', $extras);
+    
+    $form = $this->formBuilder->getForm($this->getVoteEntity($items, $value), 'votings_renders', $extras);
     $elements[] = [
       '#type' => 'html_tag',
       '#tag' => 'div',
@@ -190,7 +193,7 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
    *
    * @param FieldItemListInterface $items
    */
-  protected function getVoteEntity(FieldItemListInterface $items) {
+  protected function getVoteEntity(FieldItemListInterface $items, $value) {
     $entity = $items->getEntity();
     $user_id = \Drupal::currentUser()->id();
     //
@@ -212,7 +215,7 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
       'entity_id' => $items->getEntity()->id(),
       'entity_type' => $items->getEntity()->getEntityTypeId(),
       'value_type' => 'option',
-      'value' => 0
+      'value' => $value
     ]);
   }
   

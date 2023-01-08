@@ -71,7 +71,6 @@ class VotingsRendersBooleanForm extends ContentEntityForm {
     if ($form_state->hasValue('value')) {
       $value = $form_state->getValue('value');
     }
-    
     // Display reactions.
     $form['value'] = [
       '#type' => 'radios',
