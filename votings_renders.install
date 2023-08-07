@@ -58,7 +58,6 @@ function votings_renders_requirements($phase) {
       'severity' => $value > 50 ? REQUIREMENT_INFO : REQUIREMENT_WARNING
     ];
   }
-  
   return $requirements;
 }
 
