@@ -15,7 +15,7 @@ function votings_renders_install() {
   $voteTypeStorage = \Drupal::service('entity_type.manager')->getStorage('vote_type');
   
   // Create reactions.
-  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->condition('id', array_keys($reactions), 'IN')->execute());
+  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->accessCheck()->condition('id', array_keys($reactions), 'IN')->execute());
   foreach ($reactions as $key => $label) {
     $voteType = empty($voteTypes[$key]) ? $voteTypeStorage->create([
       'id' => $key,
@@ -36,7 +36,7 @@ function votings_renders_uninstall() {
   $voteTypeStorage = \Drupal::service('entity_type.manager')->getStorage('vote_type');
   
   // Remove reactions.
-  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->condition('id', array_keys($reactions), 'IN')->execute());
+  $voteTypes = $voteTypeStorage->loadMultiple($voteTypeStorage->getQuery()->accessCheck()->condition('id', array_keys($reactions), 'IN')->execute());
   foreach ($voteTypes as $voteType) {
     $voteType->delete();
   }

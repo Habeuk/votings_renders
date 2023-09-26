@@ -199,6 +199,7 @@ class VotingsRendersFormatterType extends FormatterBase implements ContainerFact
     //
     if ($user_id) {
       $query = \Drupal::entityTypeManager()->getStorage('vote')->getQuery();
+      $query->accessCheck();
       $query->condition('type', 'votings_renders_note');
       $query->condition('user_id', \Drupal::currentUser()->id());
       $query->condition('entity_id', $entity->id());
