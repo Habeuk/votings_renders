@@ -3,6 +3,6 @@ type: module
 description: Permet de suivre les votes des utilisateurs
 package: Custom
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
 dependencies:
   - votingapi

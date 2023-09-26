@@ -1,7 +1,7 @@
 {
   "name": "habeuk/votings_renders",
   "description": "module de vote",
-  "type": "drupal-module-custom",
+  "type": "drupal-custom-module",
   "license": "MIT",
   "authors": [
     {
